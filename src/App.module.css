@@ -1,0 +1,29 @@
+/* Outer wrapper that fills the viewport and sets a dark/neutral background for wide screens */
+.appWrapper {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background-color: #1a1a1a; /* Optional: background visible on screens wider than 1500px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Inner container locked to a max-width of 1500px */
+  .appContainer {
+    width: 100%;
+    max-width: 1500px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15); /* Gives a clean card-like drop shadow on large displays */
+    overflow: hidden;
+  }
+  
+  .mainContent {
+    flex: 1;
+    display: flex;
+    width: 100%;
+    overflow: auto;
+  }

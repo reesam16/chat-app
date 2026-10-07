@@ -1,0 +1,115 @@
+.contactList {
+    flex: 0 0 300px;
+    box-sizing: border-box;
+    padding: 16px;
+    border-right: 1px solid #dddddd;
+    background-color: #f9f9f9;
+    overflow-y: auto;
+  }
+  
+  .contactList h2 {
+    margin: 0 0 16px;
+    font-size: 1.1rem;
+    color: #333333;
+  }
+  
+  /* .contactList p {
+    margin: 0;
+    color: #666666;
+    font-size: 0.9rem;
+  } */
+  
+
+.contactItems {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.contactItem {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  background-color: transparent;
+  color: #333333;
+  font: inherit;
+}
+
+.contactItem:hover,
+.contactItem.active {
+  background-color: #e5e7eb;
+}
+
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #d1d5db;
+}
+
+.contactItem span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.contactItem strong,
+.contactItem small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contactItem strong {
+  font-size: 0.95rem;
+}
+
+.contactItem small {
+  color: #666666;
+  font-size: 0.8rem;
+}
+
+.removeContactButton {
+  flex-shrink: 0;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: #666666;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.removeContactButton:hover {
+  color: #b42318;
+}
+
+.emptyList {
+  margin: 0;
+  color: #666666;
+  font-size: 0.9rem;
+}
+
+  @media (max-width: 700px) {
+    .contactList {
+      display: none;
+    }
+  }
+  

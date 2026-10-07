@@ -1,0 +1,69 @@
+.messageThread {
+    flex: 1;
+    min-height: 0;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    /* align-items: center; */
+    /* text-align: center; */
+    overflow-y: auto;
+    background-color: #ededed;
+    /* background-color: green; */
+  }
+
+
+.threadHeader {
+  flex-shrink: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.threadHeader h2 {
+  margin: 0;
+  color: #333333;
+  font-size: 1.1rem;
+}
+
+.threadHeader span {
+  color: #777777;
+  font-size: 0.85rem;
+}
+
+.messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+}
+
+.emptyMessage {
+  align-self: center;
+  color: #888888;
+}
+
+.sentMessage,
+.receivedMessage {
+  max-width: 70%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: #222222;
+  overflow-wrap: anywhere;
+}
+
+.sentMessage {
+  align-self: flex-end;
+  background-color: #dbeafe;
+}
+
+.receivedMessage {
+  align-self: flex-start;
+  background-color: #f1f1f1;
+}
+  
+  .messageThread p {
+    margin: 0;
+    color: #888888;
+  }
+  

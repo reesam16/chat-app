@@ -1,0 +1,94 @@
+
+.layoutContainer {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.mainContent {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chatArea{
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* .header {
+  flex-shrink: 0;
+  padding: 16px;
+  background-color: #1e3a8a;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+} */
+
+/* .header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+} */
+
+/* .logoutButton {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #1e3a8a;
+} */
+
+
+/* .sidebar {
+  flex: 0 0 300px;
+  padding: 16px;
+  border-right: 1px solid #dddddd;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+} */
+
+/* .sidebar h3 {
+  margin-top: 0;
+} */
+
+/* .sidebar p {
+  color: #666666;
+  font-size: 0.9rem;
+} */
+
+
+/* .chatArea {
+  flex: 1;
+  min-width: 0;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #ffffff;
+}
+
+.chatArea p {
+  color: #888888;
+}
+
+.footer {
+  flex-shrink: 0;
+  padding: 12px;
+  background: #eee;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #666;
+} */
