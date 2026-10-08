@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AuthPage from "./features/auth/AuthPage";
 import ChatDashboard from "./features/chat/ChatDashboard";
@@ -6,16 +6,37 @@ import { authService } from "./services/authService";
 import styles from "./App.module.css";
 
 export default function App() {
-  const [user, setUser] = useState(() => authService.getCurrentUser());
+  const [user, setUser] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [authError, setAuthError] = useState("");
 
-  const handleLoginSuccess = (userData) => {
-    authService.saveCurrentUser(userData);
-    setUser(userData);
-  };
+  useEffect(() => {
+    const subscription = authService.onAuthStateChange((sessionUser) => {
+      setUser(sessionUser);
+      setIsAuthLoading(false);
+      setAuthError("");
+    });
 
-  const handleLogout = () => {
-    authService.logoutUser();
-    setUser(null);
+    authService.getCurrentUser().then(({ user: sessionUser, error }) => {
+      if (error) {
+        setAuthError(error);
+      } else {
+        setUser(sessionUser);
+      }
+      setIsAuthLoading(false);
+    }).catch((error) => {
+      setAuthError(error.message || "Unable to restore your Supabase session.");
+      setIsAuthLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLoginSuccess = (userData) => setUser(userData);
+
+  const handleLogout = async () => {
+    const { error } = await authService.logoutUser();
+    if (error) setAuthError(error);
   };
 
   return (
@@ -23,42 +44,44 @@ export default function App() {
       <div className={styles.appWrapper}>
         <div className={styles.appContainer}>
           <main className={styles.mainContent}>
-            <Routes>
-              {/* Auth Route */}
-              <Route
-                path="/login"
-                element={
-                  !user ? (
-                    <AuthPage onLoginSuccess={handleLoginSuccess} />
-                  ) : (
-                    <Navigate to="/chat" replace />
-                  )
-                }
-              />
-
-              {/* Dashboard Route */}
-              <Route
-                path="/chat"
-                element={
-                  user ? (
-                    <ChatDashboard
-                      currentUser={user}
-                      onLogout={handleLogout}
-                    />
-                  ) : (
-                    <Navigate to="/login" replace />
-                  )
-                }
-              />
-
-              {/* Catch-all redirect to login or chat */}
-              <Route
-                path="*"
-                element={
-                  <Navigate to={user ? "/chat" : "/login"} replace />
-                }
-              />
-            </Routes>
+            {isAuthLoading ? (
+              <p role="status">Connecting to Supabase...</p>
+            ) : (
+              <>
+                {authError && <p role="alert">{authError}</p>}
+                <Routes>
+                  <Route
+                    path="/login"
+                    element={
+                      !user ? (
+                        <AuthPage onLoginSuccess={handleLoginSuccess} />
+                      ) : (
+                        <Navigate to="/chat" replace />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/chat"
+                    element={
+                      user ? (
+                        <ChatDashboard
+                          currentUser={user}
+                          onLogout={handleLogout}
+                        />
+                      ) : (
+                        <Navigate to="/login" replace />
+                      )
+                    }
+                  />
+                  <Route
+                    path="*"
+                    element={
+                      <Navigate to={user ? "/chat" : "/login"} replace />
+                    }
+                  />
+                </Routes>
+              </>
+            )}
           </main>
         </div>
       </div>

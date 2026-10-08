@@ -26,6 +26,15 @@
   overflow: hidden;
 }
 
+.errorMessage {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 10px 16px;
+  color: #b42318;
+  background: #fef3f2;
+  font-size: 0.9rem;
+}
+
 /* .header {
   flex-shrink: 0;
   padding: 16px;

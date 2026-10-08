@@ -1,59 +1,67 @@
-import { MOCK_USERS, CURRENT_USER } from '../data/users';
+import { supabase } from '../lib/supabaseClient';
 
-const STORAGE_KEY = 'chat_app_messages';
+const toMessage = (message) => ({
+	id: message.id,
+	senderId: message.sender_id,
+	text: message.body,
+	createdAt: message.created_at,
+});
 
-const getThreadId = (firstUserId, secondUserId) =>
-  [firstUserId, secondUserId].sort().join(':');
-
-const getStoredMessages = () => {
-  try {
-    const messages = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    return Array.isArray(messages) ? messages : [];
-  } catch {
-    return [];
-  }
+const throwIfError = (error) => {
+	if (error) throw error;
 };
 
 export const chatService = {
-  // Returns the currently logged in user
-  getCurrentUser: () => CURRENT_USER,
+	getConversation: async (contactId) => {
+		const { data, error } = await supabase.rpc(
+			'get_or_create_direct_conversation',
+			{ target_user_id: contactId }
+		);
+		throwIfError(error);
+		return data;
+	},
 
-  // Returns all contacts except yourself
-  getContacts: () => MOCK_USERS.filter((user) => user.id !== CURRENT_USER.id),
+	getMessages: async (conversationId) => {
+		const { data, error } = await supabase
+			.from('messages')
+			.select('id, sender_id, body, created_at')
+			.eq('conversation_id', conversationId)
+			.order('created_at');
+		throwIfError(error);
+		return data.map(toMessage);
+	},
 
-  // Fetches a direct-message thread for either participant
-  getMessages: (currentUserId, contactId) => {
-    const threadId = getThreadId(currentUserId, contactId);
-    return getStoredMessages().filter((message) => {
-      if (message.threadId) return message.threadId === threadId;
+	sendMessage: async (conversationId, text) => {
+		const { data, error } = await supabase
+			.from('messages')
+			.insert({
+				conversation_id: conversationId,
+				body: text,
+			})
+			.select('id, sender_id, body, created_at')
+			.single();
+		throwIfError(error);
+		return toMessage(data);
+	},
 
-      const sameParticipants =
-        (message.senderId === currentUserId && message.recipientId === contactId) ||
-        (message.senderId === contactId && message.recipientId === currentUserId);
-      const legacyConversation =
-        (message.conversationId === contactId && message.senderId === currentUserId) ||
-        (message.conversationId === currentUserId && message.senderId === contactId);
+	subscribeToMessages: (conversationId, onMessage, onError) =>
+		supabase
+			.channel(`messages:${conversationId}`)
+			.on(
+				'postgres_changes',
+				{
+					event: 'INSERT',
+					schema: 'public',
+					table: 'messages',
+					filter: `conversation_id=eq.${conversationId}`,
+				},
+				(payload) => onMessage(toMessage(payload.new))
+			)
+			.subscribe((status, error) => {
+				if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+					onError(error || new Error('Live message updates are unavailable.'));
+				}
+			}),
 
-      return sameParticipants || legacyConversation;
-    });
-  },
-
-  // Saves a new message to localStorage
-  sendMessage: (senderId, recipientId, text) => {
-    const threadId = getThreadId(senderId, recipientId);
-    const allMessages = getStoredMessages();
-    const newMessage = {
-      id: `msg_${Date.now()}`,
-      threadId,
-      conversationId: threadId,
-      senderId,
-      recipientId,
-      text,
-      createdAt: new Date().toISOString()
-    };
-
-    allMessages.push(newMessage);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allMessages));
-    return newMessage;
-  }
+	unsubscribe: (channel) => supabase.removeChannel(channel),
 };

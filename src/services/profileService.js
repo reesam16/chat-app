@@ -1,76 +1,47 @@
-import { MOCK_USERS } from '../data/users';
+import { supabase } from '../lib/supabaseClient';
 
-const USERS_KEY = 'chat_app_registered_users';
-const CONTACTS_KEY = 'chat_app_contacts';
+const toProfile = (profile) => ({
+	id: profile.id,
+	username: profile.username,
+	name: profile.full_name,
+	avatar: profile.avatar_url || '/avatars/default.png',
+});
 
-const readArray = (key) => {
-	try {
-		const value = JSON.parse(localStorage.getItem(key) || '[]');
-		return Array.isArray(value) ? value : [];
-	} catch {
-		return [];
-	}
-};
-
-const readContactMap = () => {
-	try {
-		const value = JSON.parse(localStorage.getItem(CONTACTS_KEY) || '{}');
-		return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
-	} catch {
-		return {};
-	}
-};
-
-const withoutPassword = ({ password, ...user }) => user;
-
-const getContactIds = (userId, contactMap) => {
-	if (Array.isArray(contactMap[userId])) {
-		return contactMap[userId];
-	}
-
-	return MOCK_USERS.filter((user) => user.id !== userId).map((user) => user.id);
+const throwIfError = (error) => {
+	if (error) throw error;
 };
 
 export const profileService = {
-	getAllUsers: () => [
-		...MOCK_USERS,
-		...readArray(USERS_KEY),
-	].map(withoutPassword),
-
-	getContacts: (userId) => {
-		const usersById = new Map(
-			profileService.getAllUsers().map((user) => [user.id, user])
-		);
-		const contactMap = readContactMap();
-
-		return getContactIds(userId, contactMap)
-			.filter((contactId) => contactId !== userId)
-			.map((contactId) => usersById.get(contactId))
-			.filter(Boolean);
+	getAllUsers: async () => {
+		const { data, error } = await supabase
+			.from('profiles')
+			.select('id, username, full_name, avatar_url')
+			.order('username');
+		throwIfError(error);
+		return data.map(toProfile);
 	},
 
-	addContact: (userId, contactId) => {
-		const knownUser = profileService.getAllUsers().some(
-			(user) => user.id === contactId
-		);
-		if (!knownUser || userId === contactId) {
-			return profileService.getContacts(userId);
-		}
-
-		const contactMap = readContactMap();
-		const contactIds = getContactIds(userId, contactMap);
-		contactMap[userId] = [...new Set([...contactIds, contactId])];
-		localStorage.setItem(CONTACTS_KEY, JSON.stringify(contactMap));
-
-		return profileService.getContacts(userId);
+	getContacts: async (userId) => {
+		const { data, error } = await supabase
+			.from('contacts')
+			.select('contact:profiles!contacts_contact_id_fkey(id, username, full_name, avatar_url)')
+			.eq('user_id', userId)
+			.order('created_at');
+		throwIfError(error);
+		return data.map(({ contact }) => toProfile(contact));
 	},
 
-	removeContact: (userId, contactId) => {
-		const contactMap = readContactMap();
-		const contactIds = getContactIds(userId, contactMap);
-		contactMap[userId] = contactIds.filter((id) => id !== contactId);
-		localStorage.setItem(CONTACTS_KEY, JSON.stringify(contactMap));
+	addContact: async (contactId) => {
+		const { error } = await supabase.rpc('add_contact', {
+			target_user_id: contactId,
+		});
+		throwIfError(error);
+	},
 
-		return profileService.getContacts(userId);
+	removeContact: async (contactId) => {
+		const { error } = await supabase.rpc('remove_contact', {
+			target_user_id: contactId,
+		});
+		throwIfError(error);
 	},
 };

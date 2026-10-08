@@ -3,18 +3,23 @@ import { useState } from "react";
 import styles from "./MessageInput.module.css";
 
 
-export default function MessageInput({ activeContact, onSendMessage }) {
+export default function MessageInput({
+  activeContact,
+  onSendMessage,
+  isSending = false,
+}) {
   const [messageText, setMessageText] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!activeContact || !messageText.trim()) {
+    if (!activeContact || !messageText.trim() || isSending) {
       return;
     }
 
-    onSendMessage(messageText);
-    setMessageText("");
+    if (await onSendMessage(messageText)) {
+      setMessageText("");
+    }
   };
   return (
     <form className={styles.messageInput}  onSubmit={handleSubmit}>
@@ -30,7 +35,12 @@ export default function MessageInput({ activeContact, onSendMessage }) {
         disabled={!activeContact}
         aria-label="Write a message"
       />
-      <button type="submit" disabled={!activeContact || !messageText.trim()}>Send</button>
+      <button
+        type="submit"
+        disabled={!activeContact || !messageText.trim() || isSending}
+      >
+        {isSending ? "Sending..." : "Send"}
+      </button>
     </form>
   );
 }

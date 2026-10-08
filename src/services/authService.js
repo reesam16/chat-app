@@ -1,73 +1,68 @@
-import { MOCK_USERS } from '../data/users';
+import { supabase } from '../lib/supabaseClient';
 
-const USERS_KEY = 'chat_app_registered_users';
-const SESSION_KEY = 'chat_app_current_user';
-export const DEMO_PASSWORD = 'demo123';
+const toAppUser = (user) => {
+	if (!user) return null;
 
-const readRegisteredUsers = () => {
-	try {
-		const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-		return Array.isArray(users) ? users : [];
-	} catch {
-		return [];
-	}
+	const username =
+		user.user_metadata?.username || user.email?.split('@')[0] || 'user';
+
+	return {
+		id: user.id,
+		email: user.email,
+		username,
+		name: user.user_metadata?.full_name || username,
+		avatar: user.user_metadata?.avatar_url || '/avatars/default.png',
+	};
 };
 
-const publicUser = ({ password, ...user }) => user;
-
 export const authService = {
-	loginUser: (username, password) => {
-		const normalizedUsername = username.trim().toLowerCase();
-		const mockUsers = MOCK_USERS.map((user) => ({
-			...user,
-			password: DEMO_PASSWORD,
-		}));
-		const user = [...mockUsers, ...readRegisteredUsers()].find(
-			(candidate) =>
-				candidate.username.toLowerCase() === normalizedUsername &&
-				candidate.password === password
-		);
-
-		return user ? { user: publicUser(user) } : { error: 'Invalid username or password.' };
-	},
-
-	registerUser: (name, username, password) => {
-		const normalizedName = name.trim();
-		const normalizedUsername = username.trim().toLowerCase();
-		const registeredUsers = readRegisteredUsers();
-		const usernameTaken = [...MOCK_USERS, ...registeredUsers].some(
-			(user) => user.username.toLowerCase() === normalizedUsername
-		);
-
-		if (usernameTaken) {
-			return { error: 'That username is already taken.' };
-		}
-
-		const user = {
-			id: `usr_${crypto.randomUUID()}`,
-			name: normalizedName,
-			username: normalizedUsername,
-			avatar: '/avatars/default.png',
+	loginUser: async (email, password) => {
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email: email.trim(),
 			password,
-		};
+		});
 
-		localStorage.setItem(USERS_KEY, JSON.stringify([...registeredUsers, user]));
-		return { user: publicUser(user) };
+		return error
+			? { error: error.message }
+			: { user: toAppUser(data.user) };
 	},
 
-	getCurrentUser: () => {
-		try {
-			return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
-		} catch {
-			return null;
-		}
+	registerUser: async (name, username, email, password) => {
+		const normalizedUsername = username.trim().toLowerCase();
+		const { data, error } = await supabase.auth.signUp({
+			email: email.trim(),
+			password,
+			options: {
+				data: {
+					full_name: name.trim(),
+					username: normalizedUsername,
+				},
+				emailRedirectTo: `${window.location.origin}/login`,
+			},
+		});
+
+		if (error) return { error: error.message };
+		if (!data.session) return { confirmationRequired: true };
+
+		return { user: toAppUser(data.user) };
 	},
 
-	saveCurrentUser: (user) => {
-		localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+	getCurrentUser: async () => {
+		const { data, error } = await supabase.auth.getSession();
+		return error
+			? { error: error.message }
+			: { user: toAppUser(data.session?.user) };
 	},
 
-	logoutUser: () => {
-		localStorage.removeItem(SESSION_KEY);
+	onAuthStateChange: (callback) => {
+		const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+			callback(toAppUser(session?.user));
+		});
+		return data.subscription;
+	},
+
+	logoutUser: async () => {
+		const { error } = await supabase.auth.signOut();
+		return error ? { error: error.message } : {};
 	},
 };
