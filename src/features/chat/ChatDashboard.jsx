@@ -17,6 +17,7 @@ const mergeMessages = (existing, incoming) => {
 };
 
 export default function ChatDashboard({ currentUser, onLogout }) {
+  const [profileUser, setProfileUser] = useState(currentUser);
   const [users, setUsers] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [activeContact, setActiveContact] = useState(null);
@@ -35,6 +36,7 @@ export default function ChatDashboard({ currentUser, onLogout }) {
         if (!isActive) return;
         setUsers(allUsers);
         setContacts(userContacts);
+        setProfileUser(allUsers.find((user) => user.id === currentUser.id) || currentUser);
       })
       .catch((loadError) => {
         if (isActive) {
@@ -45,7 +47,23 @@ export default function ChatDashboard({ currentUser, onLogout }) {
     return () => {
       isActive = false;
     };
-  }, [currentUser.id]);
+  }, [currentUser]);
+
+  const handleAvatarChange = async (file) => {
+    setError("");
+    try {
+      const avatar = await profileService.updateAvatar(currentUser.id, file);
+      setProfileUser((user) => ({ ...user, avatar }));
+      setUsers((current) =>
+        current.map((user) => user.id === currentUser.id ? { ...user, avatar } : user)
+      );
+      setContacts((current) =>
+        current.map((contact) => contact.id === currentUser.id ? { ...contact, avatar } : contact)
+      );
+    } catch (avatarError) {
+      setError(avatarError.message || "Could not update your avatar.");
+    }
+  };
 
   useEffect(() => {
     const conversationId = activeContact?.conversationId;
@@ -165,7 +183,7 @@ export default function ChatDashboard({ currentUser, onLogout }) {
   return (
     <div className={styles.layoutContainer}>
       <Navbar
-        currentUser={currentUser}
+        currentUser={profileUser}
         users={users}
         contacts={contacts}
         onAddContact={handleAddContact}
@@ -173,6 +191,8 @@ export default function ChatDashboard({ currentUser, onLogout }) {
         activeContact={activeContact}
         onSelectContact={handleSelectContact}
         onLogout={onLogout}
+        onAvatarChange={handleAvatarChange}
+        error={error}
       />
 
       {error && (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from "./Navbar.module.css";
 
 export default function Navbar({
@@ -10,10 +10,14 @@ export default function Navbar({
   activeContact,
   onSelectContact,
   onLogout,
+  onAvatarChange,
+  error,
 }) {
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactsOpen, setContactsOpen] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInput = useRef(null);
   const normalizedQuery = query.trim().toLowerCase();
   const contactIds = new Set(contacts.map((contact) => contact.id));
   const results = normalizedQuery
@@ -34,6 +38,43 @@ export default function Navbar({
     setMenuOpen(false);
     setContactsOpen(false);
   };
+
+  const handleAvatarSelected = async (event) => {
+    const [file] = event.target.files || [];
+    event.target.value = "";
+    if (!file) return;
+
+    setIsUploadingAvatar(true);
+    try {
+      await onAvatarChange(file);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const renderProfileControl = () => (
+    <div className={styles.profileControl}>
+      <input
+        ref={avatarInput}
+        className={styles.srOnly}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        onChange={handleAvatarSelected}
+        aria-label="Choose a profile picture"
+      />
+      <button
+        type="button"
+        className={styles.profileButton}
+        onClick={() => avatarInput.current?.click()}
+        disabled={isUploadingAvatar}
+        aria-label={isUploadingAvatar ? "Uploading profile picture" : "Change profile picture"}
+        title={isUploadingAvatar ? "Uploading..." : "Change profile picture"}
+      >
+        <img src={currentUser.avatar} alt="" className={styles.profileAvatar} />
+        <span>{isUploadingAvatar ? "Uploading..." : currentUser.username || currentUser.email}</span>
+      </button>
+    </div>
+  );
 
   const renderUserSearch = (id) => (
     <div className={styles.userSearch}>
@@ -56,8 +97,11 @@ export default function Navbar({
               return (
                 <div className={styles.searchResult} key={user.id}>
                   <span>
+                    <img src={user.avatar} alt="" className={styles.searchAvatar} />
+                    <span className={styles.searchResultText}>
                     <strong>{user.name}</strong>
                     <small>@{user.username}</small>
+                    </span>
                   </span>
                   <button
                     type="button"
@@ -80,22 +124,14 @@ export default function Navbar({
   return (
     <header className={styles.header}>
       <h2 className={styles.brand}>Messaging App</h2>
-      {currentUser && (
-        <span className={styles.mobileHeaderUser}>
-          {currentUser.username || currentUser.email}
-        </span>
-      )}
 
       <div className={styles.desktopSearch}>
         {renderUserSearch("desktop-user-search")}
       </div>
 
+      {currentUser && renderProfileControl()}
+
       <div className={styles.navbarActions}>
-        {currentUser && (
-          <span className={styles.username}>
-            {currentUser.username || currentUser.email}
-          </span>
-        )}
         <button
           type="button"
           className={styles.logoutButton}
@@ -174,6 +210,8 @@ export default function Navbar({
               Signed in as {currentUser.username || currentUser.email}
             </p>
           )}
+          {isUploadingAvatar && <p className={styles.mobileUsername}>Uploading profile picture...</p>}
+          {error && <p className={styles.mobileError}>{error}</p>}
           <button
             type="button"
             className={styles.mobileLogout}

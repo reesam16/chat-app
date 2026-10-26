@@ -17,10 +17,6 @@
   font-size: 1.2rem;
 }
 
-.mobileHeaderUser {
-  display: none;
-}
-
 .desktopSearch {
   flex: 1;
   display: flex;
@@ -73,8 +69,21 @@
 .searchResult span {
   display: flex;
   min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.searchResultText {
   flex-direction: column;
   gap: 3px;
+}
+
+.searchAvatar {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .searchResult strong,
@@ -116,8 +125,41 @@
   flex-shrink: 0;
 }
 
-.username {
-  margin-right: 20px;
+.profileControl {
+  flex-shrink: 0;
+}
+
+.profileButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 220px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 24px;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.profileButton:disabled {
+  cursor: wait;
+}
+
+.profileButton span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profileAvatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #d1d5db;
 }
 
 .logoutButton,
@@ -176,15 +218,19 @@
     margin-right: auto;
   }
 
-  .mobileHeaderUser {
-    display: block;
-    flex-shrink: 1;
-    max-width: 35%;
+  .profileButton {
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    padding: 1px;
+  }
+
+  .profileButton span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
     overflow: hidden;
-    color: #ffffff;
-    font-size: 0.9rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    clip: rect(0, 0, 0, 0);
   }
 
   .desktopSearch,
@@ -364,6 +410,14 @@
   .mobileUsername,
   .noContacts {
     color: #666666;
+  }
+
+  .mobileError {
+    width: 100%;
+    margin: 0;
+    color: #b42318;
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
   }
 
   .removeMobileContact {

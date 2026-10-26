@@ -11,7 +11,7 @@ const toAppUser = (user) => {
 		email: user.email,
 		username,
 		name: user.user_metadata?.full_name || username,
-		avatar: user.user_metadata?.avatar_url || '/avatars/default.png',
+		avatar: user.user_metadata?.avatar_url || '/avatars/default.svg',
 	};
 };
 

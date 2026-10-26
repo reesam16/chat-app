@@ -14,8 +14,11 @@ export default function MessageThread( { activeContact, messages, currentUser } 
   return (
     <section className={styles.messageThread}>
      <div className={styles.threadHeader}>
-        <h2>{activeContact.name}</h2>
-        <span>@{activeContact.username}</span>
+        <img src={activeContact.avatar} alt="" />
+        <div>
+          <h2>{activeContact.name}</h2>
+          <span>@{activeContact.username}</span>
+        </div>
       </div>
 
       <div className={styles.messages}>

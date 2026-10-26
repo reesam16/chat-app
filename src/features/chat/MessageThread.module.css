@@ -14,9 +14,21 @@
 
 
 .threadHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex-shrink: 0;
   padding-bottom: 12px;
   border-bottom: 1px solid #eeeeee;
+}
+
+.threadHeader img {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #d1d5db;
 }
 
 .threadHeader h2 {
