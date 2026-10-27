@@ -1,25 +1,58 @@
 .messageThread {
+    position: relative;
     flex: 1;
     min-height: 0;
     padding: 16px;
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
-    /* align-items: center; */
-    /* text-align: center; */
     overflow-y: auto;
     background-color: #ededed;
-    /* background-color: green; */
+
   }
 
+  .scrollToBottomBtn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #d1d5db;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  z-index: 10;
+}
+
+.scrollToBottomBtn:hover {
+  background-color: #f3f4f6;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
 
 .threadHeader {
+  position: sticky;
+  top: 0;
+  margin: 0 auto 16px auto;
+  z-index: 100;
   display: flex;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #eeeeee;
+  padding: 5px 10px;
+
+  border: 1px solid rgba(237, 237, 237, 0.11);
+  
+  /* Frosted glass styling */
+  background-color: rgba(237, 237, 237, .11); /* Semi-transparent version of background */
+  backdrop-filter: blur(5px);                 /* Blurs anything scrolling underneath */
+  -webkit-backdrop-filter: blur(5px);         /* Safari compatibility */
+
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .threadHeader img {
@@ -44,10 +77,11 @@
 
 .messages {
   display: flex;
-  flex: 1;
   flex-direction: column;
   gap: 8px;
-  padding-top: 16px;
+  padding-top: 24px;
+  padding-bottom: 16px;
+  margin-top: auto;
 }
 
 .emptyMessage {
@@ -67,11 +101,13 @@
 .sentMessage {
   align-self: flex-end;
   background-color: #dbeafe;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .receivedMessage {
   align-self: flex-start;
   background-color: #f1f1f1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
   
   .messageThread p {
