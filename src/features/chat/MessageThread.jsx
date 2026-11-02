@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styles from "./MessageThread.module.css";
 
 export default function MessageThread({
@@ -8,20 +8,20 @@ export default function MessageThread({
 }) {
   const scrollContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const [autoScroll, setAutoScroll] = useState(true);
+  const autoScrollRef = useRef(true);
 
-    // Force scroll to bottom immediately when active contact changes
+  // Force scroll to bottom immediately when active contact changes
   useEffect(() => {
-    setAutoScroll(true);
+    autoScrollRef.current = true;
     messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   }, [activeContact?.id]);
 
   // Scroll to bottom when messages update, if autoScroll is enabled
   useEffect(() => {
-    if (autoScroll) {
+    if (autoScrollRef.current) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, autoScroll]);
+  }, [messages]);
 
   if (!activeContact) {
     return (
@@ -42,83 +42,43 @@ export default function MessageThread({
     // User is within 100px of the bottom
     const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
 
-    setAutoScroll(isNearBottom);
+    autoScrollRef.current = isNearBottom;
   };
-
-
-
-  // return (
-  //   <section
-  //     className={styles.messageThread}
-  //     ref={scrollContainerRef}
-  //     onScroll={handleScroll}
-  //   >
-  //     <div className={styles.threadHeader}>
-  //       <img src={activeContact.avatar} alt="" />
-  //       <div>
-  //         <h2>{activeContact.name}</h2>
-  //         <span>@{activeContact.username}</span>
-  //       </div>
-  //     </div>
-
-  //     <div className={styles.messages}>
-  //       {contactMessages.length === 0 ? (
-  //         <p className={styles.emptyMessage}>No messages yet.</p>
-  //       ) : (
-  //         contactMessages.map((message) => (
-  //           <div
-  //             key={message.id}
-  //             className={
-  //               message.senderId === currentUser.id
-  //                 ? styles.sentMessage
-  //                 : styles.receivedMessage
-  //             }
-  //           >
-  //             {message.text}
-  //           </div>
-  //         ))
-  //       )}
-  //       {/* Invisible anchor element at the bottom */}
-  //       <div ref={messagesEndRef} />
-  //     </div>
-  //   </section>
-  // );
-
-return (
+  return (
     <section className={styles.messageThread}>
-      <div className={styles.threadHeader}>
-        <img src={activeContact.avatar} alt="" />
-        <div>
-          <h2>{activeContact.name}</h2>
-          <span>@{activeContact.username}</span>
-        </div>
-      </div>
-
-      {/* Scrolling and bottom-alignment happen here */}
       <div
         className={styles.messages}
         ref={scrollContainerRef}
         onScroll={handleScroll}
       >
-        {contactMessages.length === 0 ? (
-          <p className={styles.emptyMessage}>No messages yet.</p>
-        ) : (
-          contactMessages.map((message) => (
-            <div
-              key={message.id}
-              className={
-                message.senderId === currentUser.id
-                  ? styles.sentMessage
-                  : styles.receivedMessage
-              }
-            >
-              {message.text}
-            </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
+        <div className={styles.threadHeader}>
+          <img src={activeContact.avatar} alt="" />
+          <div>
+            <h2>{activeContact.name}</h2>
+            <span>@{activeContact.username}</span>
+          </div>
+        </div>
+
+        <div className={styles.messageList}>
+          {contactMessages.length === 0 ? (
+            <p className={styles.emptyMessage}>No messages yet.</p>
+          ) : (
+            contactMessages.map((message) => (
+              <div
+                key={message.id}
+                className={
+                  message.senderId === currentUser.id
+                    ? styles.sentMessage
+                    : styles.receivedMessage
+                }
+              >
+                {message.text}
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
     </section>
   );
-
 }

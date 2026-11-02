@@ -1,14 +1,13 @@
 .messageThread {
-    position: relative;
-    flex: 1;
-    min-height: 0;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    background-color: #ededed;
-
-  }
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #ededed;
+}
 
   .scrollToBottomBtn {
   position: absolute;
@@ -36,21 +35,17 @@
 .threadHeader {
   position: sticky;
   top: 0;
-  margin: 0 auto 16px auto;
-  z-index: 100;
+  z-index: 1;
+  margin: 0 auto 16px;
   display: flex;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
   padding: 5px 10px;
-
   border: 1px solid rgba(237, 237, 237, 0.11);
-  
-  /* Frosted glass styling */
-  background-color: rgba(237, 237, 237, .11); /* Semi-transparent version of background */
-  backdrop-filter: blur(5px);                 /* Blurs anything scrolling underneath */
-  -webkit-backdrop-filter: blur(5px);         /* Safari compatibility */
-
+  background-color: rgba(237, 237, 237, 0.251);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   border-radius: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
@@ -76,11 +71,18 @@
 }
 
 .messages {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-bottom: 96px;
+}
+
+.messageList {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-top: 24px;
-  padding-bottom: 16px;
   margin-top: auto;
 }
 
@@ -110,8 +112,8 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
   
-  .messageThread p {
-    margin: 0;
-    color: #888888;
-  }
+.messageThread p {
+  margin: 0;
+  color: #888888;
+}
   
