@@ -63,18 +63,79 @@ export default function MessageThread({
           {contactMessages.length === 0 ? (
             <p className={styles.emptyMessage}>No messages yet.</p>
           ) : (
-            contactMessages.map((message) => (
-              <div
-                key={message.id}
-                className={
-                  message.senderId === currentUser.id
-                    ? styles.sentMessage
-                    : styles.receivedMessage
-                }
-              >
-                {message.text}
-              </div>
-            ))
+            contactMessages.map((message, index) => {
+              const messageDate = new Date(
+                message.createdAt || message.created_at,
+              );
+              const today = new Date();
+              // Check if the message was sent today
+              const isToday =
+                messageDate.toDateString() === today.toDateString();
+
+              // Get the previous message to compare against
+              const prevMessage = index > 0 ? contactMessages[index - 1] : null;
+              const prevDate = prevMessage
+                ? new Date(prevMessage.createdAt || prevMessage.created_at)
+                : null;
+
+              // Grouping conditions
+              const isFirstMessage = index === 0;
+              const senderChanged =
+                prevMessage && prevMessage.senderId !== message.senderId;
+              const isDifferentDay =
+                prevDate &&
+                messageDate.toDateString() !== prevDate.toDateString();
+
+              // Calculate time difference in minutes between this message and the previous one
+              const timeDiffMinutes = prevDate
+                ? (messageDate - prevDate) / (1000 * 60)
+                : 0;
+              const isLongGap = timeDiffMinutes > 5;
+
+              // Decide whether to show the timestamp for this message
+              const showTimestamp =
+                isFirstMessage || senderChanged || isDifferentDay || isLongGap;
+
+                // Is this message part of an ongoing stream from the same sender?
+              const isConsecutive = prevMessage && prevMessage.senderId === message.senderId && !showTimestamp;
+
+              const timeString = messageDate.toLocaleTimeString([], {
+                hour: "numeric",
+                minute: "2-digit",
+              });
+
+              const dateString = messageDate.toLocaleDateString([], {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+              });
+
+              return (
+                <div
+                  key={message.id}
+                  className={`
+                    ${message.senderId === currentUser.id ? styles.sentWrapper : styles.receivedWrapper}
+                    ${isConsecutive ? styles.consecutive : ""}
+                  `}
+                >
+                  {showTimestamp && (
+                    <span className={styles.messageTimestamp}>
+                      {!isToday && `${dateString} `}
+                      {timeString}
+                    </span>
+                  )}
+                  <div
+                    className={
+                      message.senderId === currentUser.id
+                        ? styles.sentMessage
+                        : styles.receivedMessage
+                    }
+                  >
+                    {message.text}
+                  </div>
+                </div>
+              );
+            })
           )}
           <div ref={messagesEndRef} />
         </div>

@@ -82,7 +82,7 @@
 .messageList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   margin-top: auto;
 }
 
@@ -116,4 +116,43 @@
   margin: 0;
   color: #888888;
 }
-  
+  /* date and time sent */
+.sentWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.receivedWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.messageTimestamp {
+  font-size: 0.7rem;
+  color: #888888;
+  margin-bottom: 2px;
+  padding: 0 4px;
+  user-select: none;
+}
+
+.sentWrapper,
+.receivedWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.sentWrapper {
+  align-items: flex-end;
+}
+
+.receivedWrapper {
+  align-items: flex-start;
+}
+
+/* Adds extra spacing only when the sender changes or a new timestamp block starts */
+.sentWrapper:not(.consecutive),
+.receivedWrapper:not(.consecutive) {
+  margin-top: 12px;
+}
