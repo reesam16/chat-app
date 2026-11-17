@@ -51,7 +51,11 @@ export default function MessageThread({
         ref={scrollContainerRef}
         onScroll={handleScroll}
       >
-        <div className={styles.threadHeader}>
+        <div className={styles.threadHeader} style={{ 
+    backdropFilter: 'blur(5px)', 
+    WebkitBackdropFilter: 'blur(5px)',
+    backgroundColor: 'rgba(237, 237, 237, 0.25)' 
+  }}>
           <img src={activeContact.avatar} alt="" />
           <div>
             <h2>{activeContact.name}</h2>
