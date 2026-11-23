@@ -2,7 +2,6 @@
 import { useState } from "react";
 import styles from "./MessageInput.module.css";
 
-
 export default function MessageInput({
   activeContact,
   onSendMessage,
@@ -22,13 +21,20 @@ export default function MessageInput({
     }
   };
   return (
-    <form className={styles.messageInput}  onSubmit={handleSubmit}>
+    <form
+      className={styles.messageInput}
+      style={{
+        backdropFilter: "blur(5px)",
+        WebkitBackdropFilter: "blur(5px)",
+      }}
+      onSubmit={handleSubmit}
+    >
       <input
         type="text"
         value={messageText}
         onChange={(event) => setMessageText(event.target.value)}
         placeholder={
-          activeContact 
+          activeContact
             ? `Message ${activeContact.name}...`
             : "Select a contact first"
         }
