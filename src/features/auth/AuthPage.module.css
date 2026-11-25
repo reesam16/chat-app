@@ -112,3 +112,17 @@
   .submitBtn:hover {
     background-color: #0056b3;
   }
+
+  .textButton {
+    padding: 0;
+    background: none;
+    border: none;
+    color: #007bff;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .textButton:hover {
+    color: #0056b3;
+    text-decoration: underline;
+  }

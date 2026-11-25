@@ -51,6 +51,10 @@ export default function App() {
                 {authError && <p role="alert">{authError}</p>}
                 <Routes>
                   <Route
+                    path="/reset-password"
+                    element={<AuthPage initialMode="reset" />}
+                  />
+                  <Route
                     path="/login"
                     element={
                       !user ? (
